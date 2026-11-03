@@ -1,0 +1,81 @@
+{
+  "manifest_version": 3,
+  "name": "Bili DSH Shield - B站 DeepSeek Harness 机器人防御盾",
+  "short_name": "DSH Shield",
+  "version": "2.0.0",
+  "description": "净化 B 站评论区：自动检测并屏蔽 DeepSeek Harness 机器人，支持自动排队举报、算力泥潭持续对线拖垮其运行流程、自建中心仓共享黑名单。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "B站 DSH 机器人防御盾",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_ui": {
+    "page": "popup/popup.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://*.bilibili.com/*",
+    "https://api.deepseek.com/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.bilibili.com/*"
+      ],
+      "exclude_matches": [
+        "https://live.bilibili.com/*",
+        "https://message.bilibili.com/*",
+        "https://passport.bilibili.com/*",
+        "https://member.bilibili.com/*"
+      ],
+      "js": [
+        "src/main-world.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.bilibili.com/*"
+      ],
+      "exclude_matches": [
+        "https://live.bilibili.com/*",
+        "https://message.bilibili.com/*",
+        "https://passport.bilibili.com/*",
+        "https://member.bilibili.com/*"
+      ],
+      "js": [
+        "src/icons.js",
+        "src/storage.js",
+        "src/detector.js",
+        "src/reporter.js",
+        "src/staller.js",
+        "src/hub-client.js",
+        "src/ui.js",
+        "src/comments.js",
+        "src/space.js",
+        "src/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bili DSH Shield - B站 DeepSeek Harness 防御盾</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="theme-dark">
+  <div class="app-container">
+    <!-- 头部品牌栏 -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon" id="brand-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <div class="brand-title">Bili DSH Shield</div>
+          <div class="brand-sub">DeepSeek Harness 自动化防御盾 v2.0</div>
+        </div>
+      </div>
+      <div class="header-toggle">
+        <label class="switch" title="总开关">
+          <input type="checkbox" id="master-switch">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </header>
+
+    <!-- 导航选项卡 (5个核心功能) -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="defense">常规防御</button>
+      <button class="tab-btn" data-tab="report">自动举报</button>
+      <button class="tab-btn" data-tab="stall">算力泥潭</button>
+      <button class="tab-btn" data-tab="hub">中心仓共享</button>
+      <button class="tab-btn" data-tab="lists">名单与统计</button>
+    </nav>
+
+    <!-- 选项卡内容区域 -->
+    <main class="tab-content-area">
+      <!-- Tab 1: 常规防御 -->
+      <section class="tab-pane active" id="pane-defense">
+        <div class="card">
+          <div class="card-title">
+            <span class="icon-inline">🛡️</span>
+            评论区过滤模式
+          </div>
+          <div class="radio-group">
+            <label class="radio-card">
+              <input type="radio" name="filterMode" value="collapse">
+              <div class="radio-card-body">
+                <div class="radio-title">折叠为摘要条 (推荐)</div>
+                <div class="radio-desc">检测到 DSH 机器人时折叠为单行摘要条，可展开查看或一键处置</div>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="filterMode" value="hide">
+              <div class="radio-card-body">
+                <div class="radio-title">彻底隐藏不显示</div>
+                <div class="radio-desc">直接在页面上移除该机器人评论及其所有楼中楼回复</div>
+              </div>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="filterMode" value="mark">
+              <div class="radio-card-body">
+                <div class="radio-title">仅显示警示标记</div>
+                <div class="radio-desc">保留完整评论内容，仅在用户名旁标记高危特征诊断标签</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon-inline">🎯</span>
+            判定置信度阈值
+          </div>
+          <div class="slider-row">
+            <input type="range" id="threshold-slider" min="30" max="90" step="5" value="50">
+            <span class="slider-value" id="threshold-val">50 分</span>
+          </div>
+          <div class="card-tip">综合置信度得分达到此阈值即判定为 DSH 机器人（推荐 45~55 分）。</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon-inline">🔍</span>
+            辅助识别维度
+          </div>
+          <div class="checkbox-list">
+            <label class="checkbox-row">
+              <input type="checkbox" id="check-avatar">
+              <div class="checkbox-label">
+                <div class="checkbox-title">头像蓝色色相深度分析</div>
+                <div class="checkbox-desc">识别经典 DeepSeek 机器人蓝底鲸鱼/蓝底头像色系特征</div>
+              </div>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="check-deep">
+              <div class="checkbox-label">
+                <div class="checkbox-title">自曝人设与语法深度启发式规则</div>
+                <div class="checkbox-desc">检测自曝住在DSH、Markdown格式残留、直角引号及艾特主号等特征</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: 自动举报 -->
+      <section class="tab-pane" id="pane-report">
+        <div class="card">
+          <div class="card-header-flex">
+            <div class="card-title">
+              <span class="icon-inline">🚨</span>
+              官方接口自动举报
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="check-autoreport">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="card-tip">确诊 DSH 机器人后，自动调用 B 站官方接口向平台提交违规举报。</div>
+
+          <div class="status-box" id="csrf-box">
+            <span class="status-dot" id="csrf-dot"></span>
+            <span class="status-text" id="csrf-status-text">正在检查 B 站登录凭据...</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label">举报理由分类</label>
+            <select class="form-select" id="report-reason">
+              <option value="2" selected>传播垃圾广告资源 / 脚本自动化刷屏 (强烈推荐)</option>
+              <option value="4">引战煽动 / 恶意刷屏霸榜</option>
+              <option value="5">涉嫌欺诈 / 违规营销引流</option>
+              <option value="0">其他违规行为</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label class="form-label">防风控抖动延时 (秒)</label>
+              <div class="input-range-flex">
+                <input type="number" id="report-delay-min" min="2" max="15" value="4" class="form-input-sm">
+                <span class="range-sep">至</span>
+                <input type="number" id="report-delay-max" min="5" max="30" value="8" class="form-input-sm">
+              </div>
+            </div>
+            <div class="form-group col-half">
+              <label class="form-label">单日最大举报上限</label>
+              <input type="number" id="report-max-daily" min="5" max="200" value="50" class="form-input-sm">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="report-stats-row">
+            <div class="stat-unit">
+              <div class="stat-num" id="reported-today-val">0</div>
+              <div class="stat-label">今日已自动举报</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-reset-report-count">重置今日计数</button>
+          </div>
+          <div class="card-warn-note">
+            ⚠️ 防护机制：触发 B 站 12015 频控或验证码限制时，系统会自动熔断并暂停举报，确保账号安全。
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: 算力泥潭 -->
+      <section class="tab-pane" id="pane-stall">
+        <div class="card">
+          <div class="card-header-flex">
+            <div class="card-title">
+              <span class="icon-inline">🌀</span>
+              算力泥潭持续对线
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="check-autostall">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="card-tip">
+            向 DSH 机器人自动回复耗时的高消耗复杂任务，并在其回复后持续追问质疑，极大消耗其推理 Token 算力并拖垮其运行流程。
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon-inline">🧠</span>
+            下达的复杂任务类型 (针对思维链模型设计)
+          </div>
+          <div class="checkbox-list">
+            <label class="checkbox-row">
+              <input type="checkbox" name="stallTaskType" value="math" checked>
+              <div class="checkbox-label">
+                <div class="checkbox-title">高等代数与微分几何证明</div>
+                <div class="checkbox-desc">希尔伯特零点定理准素分解、Picard 范畴与阿贝尔-雅可比定理</div>
+              </div>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="stallTaskType" value="logic" checked>
+              <div class="checkbox-label">
+                <div class="checkbox-title">自指公理悖论与形式逻辑</div>
+                <div class="checkbox-desc">ZFC 公理下 20 重自指嵌套哥德尔不完备命题、LTL 模型检测</div>
+              </div>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="stallTaskType" value="compare" checked>
+              <div class="checkbox-label">
+                <div class="checkbox-title">超长跨学科架构多维矩阵对比</div>
+                <div class="checkbox-desc">Attention/Mamba/RNN 超长上下文复杂度推演 (要求 2000 字以上)</div>
+              </div>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="stallTaskType" value="automata" checked>
+              <div class="checkbox-label">
+                <div class="checkbox-title">非确定有限自动机状态爆炸</div>
+                <div class="checkbox-desc">幂集构造法 DFA 状态转移矩阵与 Hopcroft 算法等价类最小化</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label class="form-label">最大追问轮数</label>
+              <div class="input-range-flex">
+                <input type="range" id="stall-max-turns" min="1" max="5" value="3">
+                <span class="slider-value" id="stall-max-turns-val">3 轮</span>
+              </div>
+            </div>
+            <div class="form-group col-half">
+              <label class="form-label">发评防风控延迟 (秒)</label>
+              <div class="input-range-flex">
+                <input type="number" id="stall-delay-min" min="10" max="30" value="20" class="form-input-sm">
+                <span class="range-sep">至</span>
+                <input type="number" id="stall-delay-max" min="25" max="60" value="35" class="form-input-sm">
+              </div>
+            </div>
+          </div>
+          <div class="card-tip">模拟真人深度推演节奏，杜绝高频机械发评，保障发评安全。</div>
+        </div>
+      </section>
+
+      <!-- Tab 4: 中心仓共享 -->
+      <section class="tab-pane" id="pane-hub">
+        <div class="card">
+          <div class="card-header-flex">
+            <div class="card-title">
+              <span class="icon-inline">🌐</span>
+              中心仓黑名单共享
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="check-hub-sync">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="card-tip">
+            连接独立部署的中心仓服务端，共享全网确诊 DSH 机器人名单并参与众包协同防御。
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label">中心仓服务器地址</label>
+            <input type="text" id="hub-url" class="form-input" placeholder="例如 http://your-server-ip:3000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">API Key 授权密钥 (激活凭证)</label>
+            <div class="input-btn-group">
+              <input type="password" id="hub-apikey" class="form-input" placeholder="输入形如 dsh_xxx 的密钥">
+              <button class="btn btn-primary" id="btn-hub-verify">验证并激活</button>
+            </div>
+          </div>
+
+          <div class="hub-status-card" id="hub-status-card">
+            <div class="hub-status-title">
+              <span class="status-dot" id="hub-dot"></span>
+              <span id="hub-status-badge">未激活</span>
+            </div>
+            <div class="hub-status-desc" id="hub-status-desc">
+              请输入服务端派发的 API Key 并点击「验证并激活」
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="icon-inline">🔄</span>
+            同步与众包设置
+          </div>
+          <div class="btn-group-row">
+            <button class="btn btn-secondary" id="btn-sync-inc">立即增量同步</button>
+            <button class="btn btn-secondary" id="btn-sync-all">立即全量同步</button>
+          </div>
+          <div class="checkbox-list" style="margin-top: 12px;">
+            <label class="checkbox-row">
+              <input type="checkbox" id="check-hub-autosync" checked>
+              <div class="checkbox-label">
+                <div class="checkbox-title">后台定时增量同步</div>
+                <div class="checkbox-desc">每 30 分钟通过 Service Worker 自动同步最新确诊黑名单</div>
+              </div>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="check-hub-report" checked>
+              <div class="checkbox-label">
+                <div class="checkbox-title">众包协同上报</div>
+                <div class="checkbox-desc">本地高置信度确诊的 Bot 自动上报中心仓，达阈值后全员生效</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 5: 名单与统计 -->
+      <section class="tab-pane" id="pane-lists">
+        <!-- 四宫格战绩卡片 -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🛡️</div>
+            <div class="stat-card-num" id="stat-fish-count">0</div>
+            <div class="stat-card-label">已拦截 Bot</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🚨</div>
+            <div class="stat-card-num" id="stat-report-count">0</div>
+            <div class="stat-card-label">已自动举报</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🌀</div>
+            <div class="stat-card-num" id="stat-stall-count">0</div>
+            <div class="stat-card-label">泥潭对线轮数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🌐</div>
+            <div class="stat-card-num" id="stat-hub-count">0</div>
+            <div class="stat-card-label">中心仓黑名单</div>
+          </div>
+        </div>
+
+        <!-- 名单列表管理 -->
+        <div class="card">
+          <div class="sub-nav-tabs">
+            <button class="sub-tab-btn active" data-subtab="black">本地黑名单</button>
+            <button class="sub-tab-btn" data-subtab="white">用户白名单</button>
+            <button class="sub-tab-btn" data-subtab="hubbl">中心仓黑名单</button>
+          </div>
+
+          <div class="list-action-bar">
+            <div class="input-btn-group" id="manual-add-group">
+              <input type="text" id="input-add-mid" class="form-input-sm" placeholder="输入 UID (数字)">
+              <input type="text" id="input-add-name" class="form-input-sm" placeholder="昵称备注 (可选)">
+              <button class="btn btn-primary btn-sm" id="btn-add-list">录入</button>
+            </div>
+            <input type="text" id="list-search" class="form-input-sm" placeholder="搜索当前名单中的 UID 或昵称...">
+          </div>
+
+          <div class="list-scroll-view" id="list-items-container">
+            <!-- 动态渲染列表 -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 底部状态栏 -->
+    <footer class="app-footer">
+      <div class="footer-status">
+        <span class="status-dot online"></span>
+        <span>防御系统运行中</span>
+      </div>
+      <div class="footer-links">
+        <a href="#" id="link-clear-cache">清理本地缓存</a>
+        <span>·</span>
+        <a href="https://github.com" target="_blank">帮助文档</a>
+      </div>
+    </footer>
+
+    <!-- 全局提示 Toast 容器 -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
