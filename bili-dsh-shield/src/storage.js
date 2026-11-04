@@ -21,7 +21,7 @@
 
     // 算力泥潭（持续自动回复对线消耗 Token）
     autoStall: false,       // 开启后自动下发耗时垃圾任务并持续追问
-    stallTaskTypes: ['math', 'logic', 'compare', 'automata'], // 任务类型库
+    stallTaskTypes: ['math', 'logic', 'compare', 'automata', 'quantum', 'crypto', 'concurrency', 'complexity'], // 任务类型库
     stallMaxTurns: 3,       // 单个 Bot 最大对线轮数 (默认3轮)
     stallDelayMin: 20,      // 对线回复最小间隔 (秒)
     stallDelayMax: 35,      // 对线回复最大间隔 (秒，防风控)

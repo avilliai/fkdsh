@@ -16,7 +16,7 @@
     reportMaxDaily: 50,
     reportedTodayCount: 0,
     autoStall: false,
-    stallTaskTypes: ['math', 'logic', 'compare', 'automata'],
+    stallTaskTypes: ['math', 'logic', 'compare', 'automata', 'quantum', 'crypto', 'concurrency', 'complexity'],
     stallMaxTurns: 3,
     stallDelayMin: 20,
     stallDelayMax: 35,
@@ -131,7 +131,7 @@
     // 算力泥潭
     const chkAutoStall = document.getElementById('check-autostall');
     if (chkAutoStall) chkAutoStall.checked = !!s.autoStall;
-    const stallTypes = Array.isArray(s.stallTaskTypes) ? s.stallTaskTypes : ['math', 'logic', 'compare', 'automata'];
+    const stallTypes = Array.isArray(s.stallTaskTypes) ? s.stallTaskTypes : ['math', 'logic', 'compare', 'automata', 'quantum', 'crypto', 'concurrency', 'complexity'];
     document.querySelectorAll('input[name="stallTaskType"]').forEach((box) => {
       box.checked = stallTypes.includes(box.value);
     });

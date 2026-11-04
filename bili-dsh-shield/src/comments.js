@@ -421,6 +421,15 @@
     renderAll();
   }
 
+  C.getAccount = function (mid) {
+    return accounts.get(String(mid)) || null;
+  };
+
+  C.getUname = function (mid) {
+    const a = accounts.get(String(mid));
+    return (a && a.acc && a.acc.uname) || "";
+  };
+
   /** 一键清场：将当前页面已展开的所有 DSH 评论重新折叠 */
   C.quickClear = function () {
     let count = 0;
